@@ -1,41 +1,20 @@
-function Hero() {
-  return (
-    <section className="hero" id="top" style={{position: "relative"}}>
-      <div className="hero-left">
-        <BootLog/>
-        <div className="hero-comment">name = "Dakota Straub" · stack = ["web", "seo", "paid"]</div>
-        <h1>
-          <span className="tag">$</span> build_websites <span className="ascii-arrow">→</span><br/>
-          rank_them <span className="ascii-arrow">→</span><br/>
-          run_the_ads<span style={{color: "var(--green)"}}>;</span>
-        </h1>
-        <p className="hero-summary">
-          Freelance web designer + digital marketer based in Louisville, KY.
-          I ship <span className="key">fast websites</span>, dial in <span className="key">targeted SEO</span>,
-          and run <span className="key">paid campaigns</span> on Google — so customers actually find what
-          you're building.
-        </p>
-        <div className="hero-cta">
-          <a className="btn btn-primary" href="#contact">start_project</a>
-          <a className="btn" href="#resume">cat resume.md</a>
-          <a className="btn" href="#work">ls ./projects</a>
-        </div>
-        <div style={{marginTop: 22, fontSize: 11.5, color: "var(--muted)"}}>
-          tip: press <span className="kbd">↓</span> to scroll, or <span className="kbd">⌘</span>+<span className="kbd">k</span> for nothing in particular
-        </div>
-      </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dakota Straub</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
 
-      <div className="hero-right">
-        <SysInfo/>
-      </div>
+<div id="root"></div>
 
-      <Runner />
-    </section>
-  );
-}
 <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-<script type="text/babel" src="./sections-v3.jsx"></script>
-<script type="text/babel" src="./app-v3.jsx"></script>
+<script type="text/babel" src="./app.jsx"></script>
+
+</body>
+</html>
