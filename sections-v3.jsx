@@ -13,7 +13,6 @@ function Starfighters() {
     const onResize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
     window.addEventListener("resize", onResize);
 
-    // Ship shapes (pixel-art style, drawn with lines)
     const drawShipA = (ctx, x, y, dir, color) => {
       ctx.save(); ctx.translate(x, y); ctx.scale(dir, 1);
       ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.shadowColor = color; ctx.shadowBlur = 6;
@@ -32,7 +31,7 @@ function Starfighters() {
       ctx.restore();
     };
 
-    const GREEN = "#7ee787"; const RED = "#ff7a7a"; const BLUE = "#79b8ff";
+    const GREEN = "#7ee787"; const RED = "#ff7a7a";
 
     const ships = Array.from({length: 6}, (_, i) => ({
       x: Math.random() * W,
@@ -65,24 +64,20 @@ function Starfighters() {
     const tick = () => {
       ctx.clearRect(0, 0, W, H);
 
-      // Update ships
       ships.forEach(ship => {
         if (ship.hp <= 0) return;
         ship.x += ship.vx; ship.y += ship.vy;
-        // Bounce off edges
         if (ship.x < 0 || ship.x > W) ship.vx *= -1;
         if (ship.y < 40 || ship.y > H * 0.6) ship.vy *= -1;
         ship.x = Math.max(0, Math.min(W, ship.x));
         ship.y = Math.max(40, Math.min(H * 0.6, ship.y));
 
-        // Drift toward enemies occasionally
         const enemy = ships.find(s => s.team !== ship.team && s.hp > 0);
         if (enemy) {
           const dx = enemy.x - ship.x; const dy = enemy.y - ship.y;
           const d = Math.sqrt(dx*dx + dy*dy) || 1;
           ship.vx += (dx/d) * 0.01; ship.vy += (dy/d) * 0.01;
         }
-        // Clamp speed
         const spd = Math.sqrt(ship.vx*ship.vx + ship.vy*ship.vy);
         if (spd > 1.8) { ship.vx = ship.vx/spd*1.8; ship.vy = ship.vy/spd*1.8; }
 
@@ -95,12 +90,10 @@ function Starfighters() {
         else drawShipB(ctx, ship.x, ship.y, dir, color);
       });
 
-      // Update & draw lasers
       for (let i = lasers.length - 1; i >= 0; i--) {
         const l = lasers[i];
         l.x += l.vx; l.y += l.vy; l.life--;
         if (l.life <= 0) { lasers.splice(i, 1); continue; }
-        // Hit check
         let hit = false;
         ships.forEach(ship => {
           if (ship.hp <= 0) return;
@@ -119,7 +112,6 @@ function Starfighters() {
         ctx.stroke();
       }
 
-      // Respawn dead ships
       ships.forEach(ship => {
         if (ship.hp <= 0) {
           ship.hp = 3;
@@ -130,7 +122,6 @@ function Starfighters() {
         }
       });
 
-      // Draw explosions
       for (let i = explosions.length - 1; i >= 0; i--) {
         const e = explosions[i];
         const r = (30 - e.life) * 1.2;
@@ -140,7 +131,6 @@ function Starfighters() {
         ctx.strokeStyle = `rgba(240,181,97,${alpha})`;
         ctx.lineWidth = 2; ctx.shadowColor = "#f0b561"; ctx.shadowBlur = 12;
         ctx.stroke();
-        // sparks
         for (let s = 0; s < 4; s++) {
           const angle = (s / 4) * Math.PI * 2 + e.life * 0.3;
           const sx = e.x + Math.cos(angle) * r * 0.8;
@@ -172,7 +162,6 @@ function Runner() {
   const [x, setX] = useState(-60);
   const [y, setY] = useState(0);
   const [jumping, setJumping] = useState(false);
-  const [velY, setVelY] = useState(0);
   const [obstacles, setObstacles] = useState([]);
   const [dead, setDead] = useState(false);
   const stateRef = useRef({ x: -60, y: 0, velY: 0, jumping: false, obstacles: [], dead: false, frame: 0, obstTimer: 120 });
@@ -196,14 +185,10 @@ function Runner() {
       if (!s.dead) {
         s.x += SPEED;
         if (s.x > W + 60) s.x = -60;
-
         s.velY += GRAVITY;
         s.y += s.velY;
         if (s.y >= GROUND) { s.y = GROUND; s.velY = 0; s.jumping = false; }
-
         s.frame = (s.frame + 1) % 16;
-
-        // obstacles
         s.obstTimer--;
         if (s.obstTimer <= 0) {
           s.obstacles.push({ x: W + 20 });
@@ -211,20 +196,16 @@ function Runner() {
         }
         s.obstacles = s.obstacles.filter(o => o.x > -40);
         s.obstacles.forEach(o => { o.x -= SPEED * 0.8; });
-
-        // collision (rough)
         s.obstacles.forEach(o => {
           const dx = Math.abs(s.x - o.x); const dy = Math.abs(s.y - (-20));
           if (dx < 14 && dy < 22) { s.dead = true; }
         });
       } else {
-        // auto-respawn after 1.5s
         setTimeout(() => {
           s.dead = false; s.x = -60; s.y = 0; s.velY = 0; s.jumping = false;
           s.obstacles = []; s.obstTimer = 120;
         }, 1500);
       }
-
       setX(s.x); setY(s.y); setFrame(s.frame);
       setJumping(s.jumping); setObstacles([...s.obstacles]); setDead(s.dead);
       raf = requestAnimationFrame(tick);
@@ -233,14 +214,10 @@ function Runner() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const GROUND_Y = 48; // px from bottom of hero section
-  const charY = GROUND_Y - y; // y=0 is ground, negative is up
-
-  // Simple pixel-art character frames (ASCII sprite as SVG)
+  const GROUND_Y = 48;
+  const charY = GROUND_Y - y;
   const legSwing = Math.floor(frame / 4) % 4;
-  const legPairs = [
-    ["▖▗", "▘▝"], ["▗▖", "▝▘"], ["▖▗", "▘▝"], ["  ", "▄▄"]
-  ];
+  const legPairs = [["▖▗", "▘▝"], ["▗▖", "▝▘"], ["▖▗", "▘▝"], ["  ", "▄▄"]];
   const legs = jumping ? "  " : legPairs[legSwing][0];
 
   return (
@@ -248,13 +225,10 @@ function Runner() {
       position: "absolute", bottom: 0, left: 0, right: 0, height: 60,
       pointerEvents: "none", zIndex: 10, overflow: "hidden",
     }}>
-      {/* Ground line */}
       <div style={{
         position: "absolute", bottom: 28, left: 0, right: 0,
         height: 1, background: "var(--line)", opacity: 0.6,
       }}/>
-
-      {/* Obstacles */}
       {obstacles.map((o, i) => (
         <div key={i} style={{
           position: "absolute", bottom: 28,
@@ -264,8 +238,6 @@ function Runner() {
           userSelect: "none",
         }}>▐█▌</div>
       ))}
-
-      {/* Character */}
       <div style={{
         position: "absolute",
         left: x - 10,
@@ -277,12 +249,9 @@ function Runner() {
         textShadow: `0 0 8px ${dead ? "var(--red)" : "var(--green)"}`,
         userSelect: "none",
         whiteSpace: "pre",
-        transition: dead ? "none" : undefined,
       }}>
         {dead ? "✕_✕\n/|\\\n/ \\" : (jumping ? "^_^\n/|\\\n | " : `^_^\n/|\\\n${legs} `)}
       </div>
-
-      {/* Tip */}
       <div style={{
         position: "absolute", bottom: 4, right: 16,
         fontSize: 10, color: "var(--muted-2)", fontFamily: "var(--f-mono)",
@@ -441,18 +410,6 @@ function Hero() {
         <SysInfo/>
       </div>
 
-      <Runner />
-    </section>
-  );
-}
-
-        {/* Sysinfo card below, centered */}
-        <div className="hero-card-wrap">
-          <SysInfo/>
-        </div>
-      </div>
-
-      {/* Runner lane at bottom of hero */}
       <Runner />
     </section>
   );
@@ -644,7 +601,6 @@ function ProjThumb({ kind }) {
       <rect x="184" y="86" width="56" height="56" rx="3" fill="#f0b561"/>
       <rect x="248" y="86" width="56" height="56" rx="3" fill="#79b8ff"/>
       <text x="56" y="170" fontFamily="JetBrains Mono" fontSize="11" fill="#7ee787">Aa</text>
-      <text x="120" y="Instrument Serif, serif" fontSize="14" fill="#d6e3dd">Aa</text>
       <text x="184" y="170" fontFamily="JetBrains Mono" fontSize="11" fill="#9aaca3">Aa</text>
       <text x="56" y="194" fontFamily="JetBrains Mono" fontSize="9" fill="#5d6f66">--accent  --ink  --warn  --info</text>
     </svg>
@@ -782,12 +738,10 @@ function Resume() {
             <a className="btn btn-primary" href="https://www.linkedin.com/in/dakotastraub/" target="_blank" rel="noreferrer">linkedin</a>
           </div>
         </div>
-
         <div className="resume-doc">
           <aside className="resume-side">
             <h3>dakota_straub</h3>
             <div className="role">// operations · architecture · web</div>
-
             <div className="block">
               <div className="lbl">// contact</div>
               <ul>
@@ -797,7 +751,6 @@ function Resume() {
                 <li className="row"><span>linkedin</span><a href="https://www.linkedin.com/in/dakotastraub/" target="_blank" rel="noreferrer">in/dakota…</a></li>
               </ul>
             </div>
-
             <div className="block">
               <div className="lbl">// core skills</div>
               <ul>
@@ -809,14 +762,12 @@ function Resume() {
                 <li>web · seo · paid ads</li>
               </ul>
             </div>
-
             <div className="block">
               <div className="lbl">// education</div>
               <ul>
                 <li>A.S. Information Systems<br/><span style={{color:"var(--muted)"}}>Jefferson C&TC</span></li>
               </ul>
             </div>
-
             <div className="block">
               <div className="lbl">// certifications</div>
               <ul>
@@ -826,7 +777,6 @@ function Resume() {
               </ul>
             </div>
           </aside>
-
           <div className="resume-main">
             <h4>// summary</h4>
             <p className="resume-summary">
@@ -900,7 +850,6 @@ function Contact() {
           Open for new freelance projects, contract work, and full-time conversations.
           Tell me what you're working on — I respond fast.
         </p>
-
         <div className="contact-shell">
           <div className="terminal">
             <div className="terminal-head">
@@ -921,7 +870,6 @@ function Contact() {
               <div className="line cmd"><span className="prompt">$</span><span>_<span style={{display:"inline-block", width: 7, height: 14, background: "var(--green)", verticalAlign: "middle", marginLeft: 4, animation: "cursor 1s step-end infinite"}}></span></span></div>
             </div>
           </div>
-
           <div className="contact-side">
             {[
               { k: "email", v: "dakotastraub@outlook.com", href: "mailto:dakotastraub@outlook.com" },
