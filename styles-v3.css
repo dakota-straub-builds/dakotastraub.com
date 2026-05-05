@@ -1,1518 +1,647 @@
-/* dakotastraub.com v3 — terminal / nerd aesthetic */
-
-:root {
-  --bg: #0a0e0c;
-  --bg-2: #0f1411;
-  --panel: #11171420;
-  --panel-2: #161d1a;
-  --line: #1f2a25;
-  --line-strong: #2d3b34;
-  --grid: #182320;
-  --fg: #d6e3dd;
-  --fg-2: #9aaca3;
-  --muted: #5d6f66;
-  --muted-2: #3d4a44;
-  --green: #7ee787;
-  --green-dim: #4d8a55;
-  --amber: #f0b561;
-  --red: #ff7a7a;
-  --blue: #79b8ff;
-  --accent: var(--green);
-  --accent-soft: rgba(126, 231, 135, 0.12);
-  --accent-line: rgba(126, 231, 135, 0.3);
-
-  --f-mono: "JetBrains Mono", "SF Mono", Menlo, ui-monospace, monospace;
-  --f-display: "JetBrains Mono", "SF Mono", Menlo, monospace;
-
-  --maxw: 1320px;
-  --pad-x: clamp(20px, 3.5vw, 48px);
-}
-
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-
-html {
-  background: var(--bg);
-  color: var(--fg);
-  -webkit-font-smoothing: antialiased;
-}
-
-body {
-  font-family: var(--f-mono);
-  font-size: 14px;
-  line-height: 1.55;
-  background:
-    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 36px 36px,
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 36px 36px,
-    radial-gradient(900px 600px at 80% -10%, rgba(126,231,135,0.06), transparent 60%),
-    var(--bg);
-  color: var(--fg);
-  overflow-x: hidden;
-  letter-spacing: 0.005em;
-}
-
-a { color: inherit; text-decoration: none; }
-button { font-family: inherit; cursor: pointer; }
-img, svg { display: block; max-width: 100%; }
-::selection { background: var(--green); color: var(--bg); }
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 100;
-  background: repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,0.18) 2px 3px);
-  opacity: 0.18;
-}
-
-.statusbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 60;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  gap: 0;
-  background: var(--bg-2);
-  border-bottom: 1px solid var(--line);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.statusbar > div {
-  padding: 0 14px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-right: 1px solid var(--line);
-  white-space: nowrap;
-}
-
-.statusbar .sb-mark { color: var(--green); }
-.statusbar .sb-spacer { flex: 1; border: 0; }
-.statusbar .sb-time { border-right: 0; border-left: 1px solid var(--line); color: var(--fg-2); }
-
-.statusbar .live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 8px var(--green);
-  animation: blink 1.6s step-start infinite;
-}
-
-@keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0.25; }
-}
-
-@media (max-width: 760px) {
-  .statusbar .sb-hide-sm { display: none; }
-}
-
-.nav {
-  position: fixed;
-  top: 28px;
-  left: 0;
-  right: 0;
-  z-index: 55;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px var(--pad-x);
-  background: rgba(10,14,12,0.85);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--line);
-  font-size: 12px;
-}
-
-.nav-mark { color: var(--fg); font-weight: 500; }
-.nav-mark .prompt { color: var(--green); }
-
-.nav-mark .cursor {
-  display: inline-block;
-  width: 8px;
-  height: 14px;
-  background: var(--green);
-  vertical-align: middle;
-  margin-left: 4px;
-  animation: cursor 1s step-end infinite;
-}
-
-@keyframes cursor { 50% { opacity: 0; } }
-
-.nav-links { display: flex; gap: 4px; }
-
-.nav-links a {
-  color: var(--muted);
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
-  transition: color .15s, background .15s;
-}
-
-.nav-links a:hover { color: var(--green); background: var(--accent-soft); }
-.nav-links a::before { content: "./"; color: var(--muted-2); margin-right: 1px; }
-
-.nav-cta {
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  background: var(--green);
-  color: var(--bg);
-  padding: 7px 14px;
-  border-radius: 4px;
-  border: 0;
-  font-weight: 500;
-  font-family: var(--f-mono);
-  transition: background .15s, transform .15s;
-}
-
-.nav-cta:hover { background: #b6f5be; transform: translateY(-1px); }
-
-@media (max-width: 720px) {
-  .nav-links { display: none; }
-}
-
-section {
-  padding: 100px var(--pad-x);
-  position: relative;
-}
-
-.wrap {
-  max-width: var(--maxw);
-  margin: 0 auto;
-}
-
-.section-tag {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 32px;
-}
-
-.section-tag .num { color: var(--green); }
-.section-tag .line { flex: 1; height: 1px; background: var(--line); max-width: 220px; }
-.section-tag .meta { color: var(--muted-2); }
-
-h1, h2, h3 {
-  font-family: var(--f-display);
-  font-weight: 500;
-  margin: 0;
-  letter-spacing: -0.005em;
-}
-
-h1 { font-size: clamp(32px, 5vw, 64px); line-height: 1.05; color: var(--fg); }
-h2 { font-size: clamp(28px, 3.6vw, 44px); line-height: 1.1; }
-h3 { font-size: clamp(16px, 1.4vw, 19px); line-height: 1.3; }
-
-p { color: var(--fg-2); }
-
-.green { color: var(--green); }
-.amber { color: var(--amber); }
-.muted { color: var(--muted); }
-.dim { color: var(--muted); }
-
-.hero {
-  padding-top: 110px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-  text-align: center;
-}
-
-.hero > div:first-child {
-  width: 100%;
-  max-width: 720px;
-}
-
-.boot-log {
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 14px 18px;
-  font-size: 12px;
-  color: var(--fg-2);
-  margin: 0 auto 28px;
-  max-width: 620px;
-  text-align: left;
-}
-
-.boot-log .line { display: flex; gap: 10px; }
-.boot-log .ts { color: var(--muted-2); }
-.boot-log .lvl-ok { color: var(--green); }
-.boot-log .lvl-warn { color: var(--amber); }
-.boot-log .lvl-info { color: var(--blue); }
-
-.hero h1 .tag { color: var(--green); }
-.hero h1 .ascii-arrow { color: var(--muted); }
-
-.hero-comment {
-  color: var(--muted);
-  font-size: 13px;
-  margin-bottom: 14px;
-}
-
-.hero-comment::before {
-  content: "// ";
-  color: var(--muted-2);
-}
-
-.hero-summary {
-  margin: 28px auto 0;
-  max-width: 580px;
-  font-size: 14.5px;
-  line-height: 1.65;
-  color: var(--fg-2);
-}
-
-.hero-summary .key { color: var(--green); }
-
-.hero-cta {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 32px;
-  flex-wrap: wrap;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 16px;
-  border-radius: 4px;
-  font-family: var(--f-mono);
-  font-size: 12.5px;
-  letter-spacing: 0.02em;
-  border: 1px solid var(--line-strong);
-  background: var(--panel-2);
-  color: var(--fg);
-  transition: background .15s, border-color .15s, color .15s;
-}
-
-.btn::before { content: ">"; color: var(--green); }
-.btn:hover { border-color: var(--green); color: var(--green); background: var(--accent-soft); }
-
-.btn-primary {
-  background: var(--green);
-  color: var(--bg);
-  border-color: var(--green);
-  font-weight: 500;
-}
-
-.btn-primary::before { content: ">"; color: var(--bg); }
-.btn-primary:hover { background: #b6f5be; color: var(--bg); }
-
-.kbd {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 3px;
-  background: var(--panel-2);
-  border: 1px solid var(--line-strong);
-  font-size: 11px;
-  color: var(--fg-2);
-  margin: 0 2px;
-}
-
-.sysinfo {
-  width: 100%;
-  max-width: 720px;
-  text-align: left;
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  overflow: hidden;
-  font-size: 12px;
-}
-
-.sysinfo-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: #0a100d;
-  border-bottom: 1px solid var(--line);
-  color: var(--muted);
-}
-
-.sysinfo-head .dots { display: flex; gap: 5px; }
-
-.sysinfo-head .dots i {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--muted-2);
-  display: inline-block;
-}
-
-.sysinfo-head .dots i:nth-child(1) { background: #ff5f56; }
-.sysinfo-head .dots i:nth-child(2) { background: #ffbd2e; }
-.sysinfo-head .dots i:nth-child(3) { background: #27c93f; }
-.sysinfo-head .title { font-size: 11px; letter-spacing: 0.04em; }
-
-.sysinfo-body {
-  padding: 18px;
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 18px;
-  align-items: start;
-}
-
-.sysinfo-portrait {
-  width: 110px;
-  height: 110px;
-  border-radius: 4px;
-  overflow: hidden;
-  border: 1px solid var(--line-strong);
-  position: relative;
-  filter: saturate(0.85) contrast(1.05);
-}
-
-.sysinfo-portrait img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.sysinfo-portrait::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(rgba(126,231,135,0.06), transparent 60%);
-  mix-blend-mode: screen;
-}
-
-.sysinfo-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 12px;
-}
-
-.sysinfo-row {
-  display: grid;
-  grid-template-columns: 88px 1fr;
-  gap: 10px;
-}
-
-.sysinfo-row .k { color: var(--green); }
-.sysinfo-row .v { color: var(--fg-2); }
-
-.sysinfo-divider {
-  color: var(--muted-2);
-  margin: 6px 0;
-  user-select: none;
-}
-
-.sysinfo-bars { padding: 0 18px 16px; }
-
-.sysinfo-bar {
-  font-size: 11px;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-
-.sysinfo-bar .row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.sysinfo-bar .track {
-  height: 6px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  position: relative;
-  overflow: hidden;
-  border-radius: 2px;
-}
-
-.sysinfo-bar .fill {
-  height: 100%;
-  background: var(--green);
-  box-shadow: 0 0 6px var(--green);
-}
-
-.sysinfo-foot {
-  padding: 10px 14px;
-  border-top: 1px solid var(--line);
-  font-size: 11px;
-  color: var(--muted);
-  display: flex;
-  justify-content: space-between;
-  background: #0a100d;
-}
-
-.ascii-divider {
-  font-size: 11px;
-  color: var(--muted-2);
-  white-space: pre;
-  overflow: hidden;
-  padding: 18px var(--pad-x);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  background: var(--bg-2);
-  text-align: center;
-  user-select: none;
-}
-
-.about-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 50px;
-}
-
-@media (max-width: 900px) {
-  .about-grid { grid-template-columns: 1fr; gap: 32px; }
-}
-
-.about-grid p {
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--fg-2);
-  margin: 0 0 18px;
-}
-
-.about-grid p .green { color: var(--green); }
-
-.tree {
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 18px 20px;
-  font-size: 12.5px;
-  color: var(--fg-2);
-}
-
-.tree .head {
-  color: var(--muted);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 14px;
-}
-
-.tree pre {
-  margin: 0;
-  font-family: var(--f-mono);
-  font-size: 12.5px;
-  line-height: 1.7;
-}
-
-.tree .dir { color: var(--blue); }
-.tree .file { color: var(--fg-2); }
-.tree .accent { color: var(--green); }
-
-.cmd-list {
-  margin-top: 30px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--panel-2);
-  overflow: hidden;
-}
-
-.cmd-row {
-  display: grid;
-  grid-template-columns: 60px minmax(0, 200px) minmax(0, 1.3fr) auto;
-  gap: 18px;
-  align-items: start;
-  padding: 22px 22px;
-  border-top: 1px solid var(--line);
-  cursor: pointer;
-  position: relative;
-  transition: background .15s;
-}
-
-.cmd-row:first-child { border-top: 0; }
-.cmd-row:hover { background: var(--accent-soft); }
-.cmd-row:hover .cmd-arrow { color: var(--green); }
-
-.cmd-num { color: var(--muted-2); font-size: 12px; }
-.cmd-name { color: var(--green); font-size: 14px; }
-.cmd-name .flag { color: var(--muted); }
-.cmd-desc { color: var(--fg-2); font-size: 13.5px; line-height: 1.55; }
-
-.cmd-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 8px;
-}
-
-.cmd-tags span {
-  font-size: 10.5px;
-  padding: 2px 7px;
-  border: 1px solid var(--line-strong);
-  color: var(--muted);
-  border-radius: 2px;
-}
-
-.cmd-arrow {
-  color: var(--muted-2);
-  font-size: 16px;
-  transition: color .15s, transform .15s;
-}
-
-.cmd-row:hover .cmd-arrow { transform: translateX(3px); }
-
-@media (max-width: 760px) {
-  .cmd-row { grid-template-columns: 1fr; gap: 6px; }
-  .cmd-arrow { display: none; }
-}
-
-.proj-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-top: 30px;
-}
-
-@media (max-width: 760px) {
-  .proj-grid { grid-template-columns: 1fr; }
-}
-
-.proj-card {
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--panel-2);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  transition: border-color .15s, transform .15s;
-}
-
-.proj-card:hover {
-  border-color: var(--green);
-  transform: translateY(-3px);
-}
-
-.proj-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px;
-  border-bottom: 1px solid var(--line);
-  font-size: 11px;
-  color: var(--muted);
-  background: #0a100d;
-}
-
-.proj-head .id { color: var(--green); }
-
-.proj-head .badge {
-  padding: 1px 7px;
-  border: 1px solid var(--line-strong);
-  color: var(--fg-2);
-  border-radius: 2px;
-}
-
-.proj-thumb {
-  aspect-ratio: 16/10;
-  border-bottom: 1px solid var(--line);
-  background: var(--bg-2);
-}
-
-.proj-body { padding: 18px 20px; }
-.proj-body h3 { font-size: 17px; color: var(--fg); }
-.proj-body p { font-size: 13px; color: var(--fg-2); margin-top: 8px; }
-
-.proj-stats {
-  display: flex;
-  gap: 16px;
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px dashed var(--line);
-}
-
-.proj-stats > div {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.proj-stats .v {
-  color: var(--green);
-  font-size: 14px;
-}
-
-.resume {
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  background: linear-gradient(180deg, var(--bg-2), var(--bg));
-}
-
-.resume-doc {
-  margin-top: 30px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--panel-2);
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 290px 1fr;
-}
-
-@media (max-width: 880px) {
-  .resume-doc { grid-template-columns: 1fr; }
-}
-
-.resume-side {
-  padding: 26px 22px;
-  border-right: 1px solid var(--line);
-  background: #0a100d;
-}
-
-.resume-side h3 { font-size: 18px; color: var(--green); }
-
-.resume-side .role {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 4px;
-  letter-spacing: 0.04em;
-}
-
-.resume-side .block { margin-top: 24px; }
-
-.resume-side .lbl {
-  font-size: 10.5px;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.resume-side ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 12.5px;
-  color: var(--fg-2);
-}
-
-.resume-side ul li::before { content: "─ "; color: var(--green-dim); }
-.resume-side .row { display: flex; justify-content: space-between; gap: 6px; }
-.resume-side .row::before { content: ""; }
-.resume-side a { color: var(--fg-2); border-bottom: 1px dashed var(--muted-2); }
-.resume-side a:hover { color: var(--green); border-color: var(--green); }
-
-.resume-main { padding: 26px 28px; }
-
-.resume-main h4 {
-  font-size: 11px;
-  color: var(--green);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin: 0 0 12px;
-  font-weight: 500;
-}
-
-.resume-summary {
-  font-size: 13.5px;
-  line-height: 1.7;
-  color: var(--fg-2);
-  margin: 0 0 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px dashed var(--line);
-}
-
-.resume-job {
-  padding: 14px 0;
-  border-bottom: 1px dashed var(--line);
-}
-
-.resume-job:last-child { border-bottom: 0; }
-
-.resume-job-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: baseline;
-  flex-wrap: wrap;
-}
-
-.resume-job .title { color: var(--fg); font-size: 14px; }
-.resume-job .co { color: var(--green); font-size: 11.5px; margin-top: 2px; }
-.resume-job .yr { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
-
-.resume-job ul {
-  margin: 10px 0 0;
-  padding-left: 14px;
-  color: var(--fg-2);
-  font-size: 13px;
-  line-height: 1.65;
-  list-style: none;
-}
-
-.resume-job ul li {
-  margin-bottom: 3px;
-  position: relative;
-  padding-left: 12px;
-}
-
-.resume-job ul li::before {
-  content: "›";
-  position: absolute;
-  left: 0;
-  color: var(--green);
-}
-
-.panel-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 30px;
-}
-
-@media (max-width: 800px) {
-  .panel-grid { grid-template-columns: 1fr; }
-}
-
-.panel {
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--panel-2);
-  padding: 22px;
-}
-
-.panel .lbl {
-  font-size: 10.5px;
-  letter-spacing: 0.1em;
-  color: var(--green);
-  text-transform: uppercase;
-}
-
-.panel h3 { margin-top: 12px; color: var(--fg); }
-.panel p { margin-top: 10px; font-size: 13px; color: var(--fg-2); }
-
-.stack-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 30px;
-}
-
-@media (max-width: 900px) {
-  .stack-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 520px) {
-  .stack-grid { grid-template-columns: 1fr; }
-}
-
-.stack-cell {
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--panel-2);
-  padding: 14px 16px;
-}
-
-.stack-cell .cat {
-  font-size: 10.5px;
-  color: var(--muted);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.stack-cell ul {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 13px;
-  color: var(--fg-2);
-}
-
-.stack-cell ul li::before { content: "└─ "; color: var(--green-dim); }
-.stack-cell ul li:first-child::before { content: "├─ "; }
-
-.contact { border-top: 1px solid var(--line); }
-
-.contact-shell {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  gap: 40px;
-  align-items: start;
-  margin-top: 30px;
-}
-
-@media (max-width: 880px) {
-  .contact-shell { grid-template-columns: 1fr; gap: 24px; }
-}
-
-.terminal {
-  background: #06090807;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-}
-
-.terminal-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--line);
-  background: #0a100d;
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.terminal-head .dots { display: flex; gap: 5px; }
-
-.terminal-head .dots i {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.terminal-head .dots i:nth-child(1) { background: #ff5f56; }
-.terminal-head .dots i:nth-child(2) { background: #ffbd2e; }
-.terminal-head .dots i:nth-child(3) { background: #27c93f; }
-
-.terminal-body {
-  padding: 18px 20px;
-  font-size: 13px;
-  line-height: 1.7;
-  min-height: 220px;
-}
-
-.terminal-body .line { display: flex; gap: 8px; }
-.terminal-body .line.cmd .prompt { color: var(--green); }
-.terminal-body .line.cmd { color: var(--fg); }
-.terminal-body .line.out { color: var(--fg-2); padding-left: 14px; }
-.terminal-body .line.out .k { color: var(--green); }
-.terminal-body .line.empty { height: 0.6em; }
-
-.contact-side {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.contact-row {
-  display: grid;
-  grid-template-columns: 90px 1fr auto;
-  gap: 14px;
-  align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 12.5px;
-}
-
-.contact-row:first-child { border-top: 1px solid var(--line); }
-.contact-row .k { color: var(--green); }
-.contact-row .v { color: var(--fg-2); transition: color .15s; }
-.contact-row:hover .v { color: var(--fg); }
-.contact-row .arrow { color: var(--muted-2); transition: color .15s, transform .15s; }
-.contact-row:hover .arrow { color: var(--green); transform: translate(2px, -2px); }
-
-footer {
-  padding: 30px var(--pad-x);
-  border-top: 1px solid var(--line);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-  background: var(--bg-2);
-}
-
-footer .pulse {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-footer .pulse i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 6px var(--green);
-  animation: blink 1.4s step-start infinite;
-}
-
-.reveal {
-  opacity: 0;
-  transform: translateY(14px);
-  transition: opacity .6s, transform .6s;
-}
-
-.reveal.in {
-  opacity: 1;
-  transform: none;
-}
-
-.starfighters {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
-}
-
-.ship {
-  position: absolute;
-  font-size: 22px;
-  font-family: var(--f-mono);
-  opacity: 0.5;
-  text-shadow: 0 0 10px currentColor;
-}
-
-.ship-a {
-  color: var(--green);
-  top: 24%;
-  left: -5%;
-  animation: fly-right 9s linear infinite;
-}
-
-.ship-b {
-  color: var(--red);
-  top: 34%;
-  right: -5%;
-  animation: fly-left 11s linear infinite;
-}
-
-.ship-c {
-  color: var(--green);
-  top: 62%;
-  left: -5%;
-  animation: fly-right 13s linear infinite;
-  animation-delay: 2s;
-}
-
-.ship-d {
-  color: var(--red);
-  top: 72%;
-  right: -5%;
-  animation: fly-left 10s linear infinite;
-  animation-delay: 4s;
-}
-
-.laser {
-  position: absolute;
-  width: 54px;
-  height: 2px;
-  opacity: 0.55;
-  box-shadow: 0 0 8px currentColor;
-}
-
-.laser-a {
-  color: var(--green);
-  background: var(--green);
-  top: 26%;
-  left: -10%;
-  animation: laser-right 4s linear infinite;
-}
-
-.laser-b {
-  color: var(--red);
-  background: var(--red);
-  top: 36%;
-  right: -10%;
-  animation: laser-left 4.5s linear infinite;
-}
-
-.laser-c {
-  color: var(--green);
-  background: var(--green);
-  top: 64%;
-  left: -10%;
-  animation: laser-right 5s linear infinite;
-  animation-delay: 1.5s;
-}
-
-.laser-d {
-  color: var(--red);
-  background: var(--red);
-  top: 74%;
-  right: -10%;
-  animation: laser-left 4.2s linear infinite;
-  animation-delay: 2.5s;
-}
-
-@keyframes fly-right {
-  0% {
-    transform: translateX(0) translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateX(55vw) translateY(-35px) rotate(-8deg);
-  }
-  100% {
-    transform: translateX(110vw) translateY(25px) rotate(6deg);
-  }
-}
-
-@keyframes fly-left {
-  0% {
-    transform: translateX(0) translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateX(-55vw) translateY(35px) rotate(8deg);
-  }
-  100% {
-    transform: translateX(-110vw) translateY(-25px) rotate(-6deg);
-  }
-}
-
-@keyframes laser-right {
-  0% { transform: translateX(0); opacity: 0; }
-  10% { opacity: 0.65; }
-  90% { opacity: 0.65; }
-  100% { transform: translateX(115vw); opacity: 0; }
-}
-
-@keyframes laser-left {
-  0% { transform: translateX(0); opacity: 0; }
-  10% { opacity: 0.65; }
-  90% { opacity: 0.65; }
-  100% { transform: translateX(-115vw); opacity: 0; }
-}
-
-.runner-lane {
-  width: 100%;
-  max-width: 720px;
-  height: 70px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: rgba(15, 20, 17, 0.75);
-}
-
-.runner-lane::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 16px;
-  height: 1px;
-  background: var(--line-strong);
-}
-
-.runner {
-  position: absolute;
-  left: 28px;
-  bottom: 18px;
-  color: var(--green);
-  font-size: 20px;
-  text-shadow: 0 0 8px var(--green);
-  animation: runner-hop 1.2s ease-in-out infinite;
-}
-
-.obstacle {
-  position: absolute;
-  bottom: 18px;
-  color: var(--amber);
-  font-size: 18px;
-  text-shadow: 0 0 8px var(--amber);
-}
-
-.obstacle-a {
-  right: -40px;
-  animation: obstacle-run 4s linear infinite;
-}
-
-.obstacle-b {
-  right: -80px;
-  animation: obstacle-run 5.5s linear infinite;
-  animation-delay: 1.2s;
-}
-
-.obstacle-c {
-  right: -120px;
-  animation: obstacle-run 6.5s linear infinite;
-  animation-delay: 2.4s;
-}
-
-@keyframes runner-hop {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  45% {
-    transform: translateY(-16px);
-  }
-}
-
-@keyframes obstacle-run {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-820px);
-  }
-}
-
-@media (max-width: 720px) {
-  .starfighters {
-    opacity: 0.45;
-  }
-
-  .runner-lane {
-    max-width: 100%;
-  }
-}
-
-/* ─── starfighters background ─── */
-.starfighters {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
-}
-
-.ship {
-  position: absolute;
-  font-size: 22px;
-  font-family: var(--f-mono);
-  opacity: 0.5;
-  text-shadow: 0 0 10px currentColor;
-}
-
-.ship-a {
-  color: var(--green);
-  top: 24%;
-  left: -5%;
-  animation: fly-right 9s linear infinite;
-}
-
-.ship-b {
-  color: var(--red);
-  top: 34%;
-  right: -5%;
-  animation: fly-left 11s linear infinite;
-}
-
-.ship-c {
-  color: var(--green);
-  top: 62%;
-  left: -5%;
-  animation: fly-right 13s linear infinite;
-  animation-delay: 2s;
-}
-
-.ship-d {
-  color: var(--red);
-  top: 72%;
-  right: -5%;
-  animation: fly-left 10s linear infinite;
-  animation-delay: 4s;
-}
-
-.laser {
-  position: absolute;
-  width: 54px;
-  height: 2px;
-  opacity: 0.55;
-  box-shadow: 0 0 8px currentColor;
-}
-
-.laser-a {
-  color: var(--green);
-  background: var(--green);
-  top: 26%;
-  left: -10%;
-  animation: laser-right 4s linear infinite;
-}
-
-.laser-b {
-  color: var(--red);
-  background: var(--red);
-  top: 36%;
-  right: -10%;
-  animation: laser-left 4.5s linear infinite;
-}
-
-.laser-c {
-  color: var(--green);
-  background: var(--green);
-  top: 64%;
-  left: -10%;
-  animation: laser-right 5s linear infinite;
-  animation-delay: 1.5s;
-}
-
-.laser-d {
-  color: var(--red);
-  background: var(--red);
-  top: 74%;
-  right: -10%;
-  animation: laser-left 4.2s linear infinite;
-  animation-delay: 2.5s;
-}
-
-@keyframes fly-right {
-  0% {
-    transform: translateX(0) translateY(0) rotate(0deg);
-  }
-
-  50% {
-    transform: translateX(55vw) translateY(-35px) rotate(-8deg);
-  }
-
-  100% {
-    transform: translateX(110vw) translateY(25px) rotate(6deg);
-  }
-}
-
-@keyframes fly-left {
-  0% {
-    transform: translateX(0) translateY(0) rotate(0deg);
-  }
-
-  50% {
-    transform: translateX(-55vw) translateY(35px) rotate(8deg);
-  }
-
-  100% {
-    transform: translateX(-110vw) translateY(-25px) rotate(-6deg);
-  }
-}
-
-@keyframes laser-right {
-  0% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-
-  10% {
-    opacity: 0.65;
-  }
-
-  90% {
-    opacity: 0.65;
-  }
-
-  100% {
-    transform: translateX(115vw);
-    opacity: 0;
-  }
-}
-
-@keyframes laser-left {
-  0% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-
-  10% {
-    opacity: 0.65;
-  }
-
-  90% {
-    opacity: 0.65;
-  }
-
-  100% {
-    transform: translateX(-115vw);
-    opacity: 0;
-  }
-}
-
-/* ─── runner lane ─── */
-.runner-lane {
-  width: 100%;
-  max-width: 720px;
-  height: 70px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: rgba(15, 20, 17, 0.75);
-  z-index: 3;
-}
-
-.runner-lane::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 16px;
-  height: 1px;
-  background: var(--line-strong);
-}
-
-.runner {
-  position: absolute;
-  left: 28px;
-  bottom: 18px;
-  color: var(--green);
-  font-size: 20px;
-  text-shadow: 0 0 8px var(--green);
-  animation: runner-hop 1.2s ease-in-out infinite;
-}
-
-.obstacle {
-  position: absolute;
-  bottom: 18px;
-  color: var(--amber);
-  font-size: 18px;
-  text-shadow: 0 0 8px var(--amber);
-}
-
-.obstacle-a {
-  right: -40px;
-  animation: obstacle-run 4s linear infinite;
-}
-
-.obstacle-b {
-  right: -80px;
-  animation: obstacle-run 5.5s linear infinite;
-  animation-delay: 1.2s;
-}
-
-.obstacle-c {
-  right: -120px;
-  animation: obstacle-run 6.5s linear infinite;
-  animation-delay: 2.4s;
-}
-
-@keyframes runner-hop {
-  0%, 100% {
-    transform: translateY(0);
-  }
-
-  45% {
-    transform: translateY(-16px);
-  }
-}
-
-@keyframes obstacle-run {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-820px);
-  }
-}
-
-@media (max-width: 720px) {
-  .starfighters {
-    opacity: 0.45;
-  }
-
-  .runner-lane {
-    max-width: 100%;
-  }
-}
-
-/* FINAL HERO + RUNNER OVERRIDES */
-
-.hero {
-  padding-top: 110px;
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: minmax(0, 600px) minmax(0, 520px);
-  gap: 40px;
-  align-items: center;
-  justify-content: center;
-  max-width: 1160px;
-  margin: 0 auto;
-  text-align: left;
-}
-
-.hero > div:first-child {
-  width: 100%;
-  max-width: 600px;
-}
-
-.boot-log {
-  margin: 0 0 28px;
-}
-
-.hero-summary {
-  margin: 28px 0 0;
-}
-
-.hero-cta {
-  justify-content: flex-start;
-}
-
-.sysinfo {
-  width: 100%;
-  max-width: 520px;
-}
-
-/* This forces the runner lane under the left text column */
-.runner-lane {
-  grid-column: 1;
-  width: 100%;
-  max-width: 600px;
-  height: 70px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: rgba(15, 20, 17, 0.75);
-  z-index: 3;
-}
-
-/* Make the runner more visible */
-.runner {
-  position: absolute;
-  left: 28px;
-  bottom: 18px;
-  color: var(--green);
-  font-size: 24px;
-  text-shadow: 0 0 10px var(--green);
-  animation: runner-hop 1.2s ease-in-out infinite;
-}
-
-/* Make ships/lasers easier to see */
-.ship {
-  opacity: 0.8;
-}
-
-.laser {
-  opacity: 0.8;
-}
-
-@media (max-width: 980px) {
-  .hero {
-    grid-template-columns: 1fr;
-    max-width: 720px;
-    text-align: center;
-  }
-
-  .hero-cta {
-    justify-content: center;
-  }
-
-  .hero-summary,
-  .boot-log {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .runner-lane {
-    grid-column: 1;
-    max-width: 100%;
-  }
-
-  .sysinfo {
-    max-width: 100%;
-  }
-}
+// dakotastraub.com v3
+const { useEffect, useRef, useState } = React;
+
+function Starfighters() {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let W = canvas.width  = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
+    const onResize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
+    window.addEventListener("resize", onResize);
+    const GREEN = "#7ee787", RED = "#ff7a7a";
+    function drawShip(x, y, angle, color) {
+      ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
+      ctx.strokeStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 10; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(14,0); ctx.lineTo(-8,-6); ctx.lineTo(-5,0); ctx.lineTo(-8,6); ctx.closePath(); ctx.stroke();
+      ctx.globalAlpha = 0.45;
+      ctx.beginPath(); ctx.moveTo(-5,0); ctx.lineTo(-16,0); ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.globalAlpha = 1; ctx.restore();
+    }
+    function drawLaser(x, y, vx, vy, color) {
+      ctx.save();
+      ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-vx*4, y-vy*4);
+      ctx.strokeStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 12; ctx.lineWidth = 2; ctx.stroke();
+      ctx.restore();
+    }
+    function drawExplosion(x, y, p) {
+      const r = p*34, a = 1-p;
+      ctx.save();
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(240,181,97,${a})`; ctx.shadowColor="#f0b561"; ctx.shadowBlur=20; ctx.lineWidth=2.5; ctx.stroke();
+      ctx.restore();
+    }
+    function makeShip(team, i) {
+      const g = team==="green";
+      return {
+        x: g ? 60+Math.random()*W*0.25 : W*0.75+Math.random()*W*0.2,
+        y: 80+Math.random()*(H*0.65),
+        vx: (0.6+Math.random()*0.8)*(g?1:-1),
+        vy: (Math.random()-0.5)*0.6,
+        angle: g?0:Math.PI, team, hp:3, alive:true,
+        fireTimer: 30+Math.floor(Math.random()*80), respawnIn:0,
+      };
+    }
+    const ships = [
+      makeShip("green",0), makeShip("green",1), makeShip("green",2),
+      makeShip("red",0),   makeShip("red",1),   makeShip("red",2),
+    ];
+    const lasers=[], explosions=[];
+    function fire(ship) {
+      const enemies = ships.filter(s=>s.team!==ship.team&&s.alive);
+      if (!enemies.length) return;
+      const target = enemies.reduce((b,s)=>Math.hypot(s.x-ship.x,s.y-ship.y)<Math.hypot(b.x-ship.x,b.y-ship.y)?s:b, enemies[0]);
+      const SPEED=7, dist=Math.hypot(target.x-ship.x,target.y-ship.y)||1;
+      const t=dist/SPEED, ax=target.x+target.vx*t, ay=target.y+target.vy*t;
+      const d=Math.hypot(ax-ship.x,ay-ship.y)||1;
+      lasers.push({ x:ship.x, y:ship.y, vx:(ax-ship.x)/d*SPEED, vy:(ay-ship.y)/d*SPEED, color:ship.team==="green"?GREEN:RED, owner:ship.team, life:65 });
+    }
+    let raf;
+    function tick() {
+      ctx.clearRect(0,0,W,H);
+      for (const ship of ships) {
+        if (!ship.alive) { ship.respawnIn--; if (ship.respawnIn<=0) Object.assign(ship, makeShip(ship.team, ships.indexOf(ship)%3)); continue; }
+        const enemies = ships.filter(s=>s.team!==ship.team&&s.alive);
+        if (enemies.length) {
+          const target = enemies.reduce((b,s)=>Math.hypot(s.x-ship.x,s.y-ship.y)<Math.hypot(b.x-ship.x,b.y-ship.y)?s:b, enemies[0]);
+          const dist=Math.hypot(target.x-ship.x,target.y-ship.y)||1;
+          const force=dist>150?0.03:0.008;
+          ship.vx+=(target.x-ship.x)/dist*force; ship.vy+=(target.y-ship.y)/dist*force;
+          ship.angle=Math.atan2(ship.vy,ship.vx);
+          ship.fireTimer--; if(ship.fireTimer<=0){ if(dist<600) fire(ship); ship.fireTimer=50+Math.floor(Math.random()*70); }
+        }
+        const spd=Math.hypot(ship.vx,ship.vy); if(spd>2.2){ship.vx=ship.vx/spd*2.2;ship.vy=ship.vy/spd*2.2;}
+        ship.x+=ship.vx; ship.y+=ship.vy;
+        if(ship.x<50) ship.vx+=0.5; if(ship.x>W-50) ship.vx-=0.5;
+        if(ship.y<55) ship.vy+=0.5; if(ship.y>H*0.78) ship.vy-=0.5;
+        drawShip(ship.x,ship.y,ship.angle,ship.team==="green"?GREEN:RED);
+      }
+      for(let i=lasers.length-1;i>=0;i--){
+        const l=lasers[i]; l.x+=l.vx; l.y+=l.vy; l.life--;
+        if(l.life<=0||l.x<-20||l.x>W+20||l.y<-20||l.y>H+20){lasers.splice(i,1);continue;}
+        let hit=false;
+        for(const ship of ships){
+          if(!ship.alive||ship.team===l.owner) continue;
+          if(Math.hypot(ship.x-l.x,ship.y-l.y)<14){
+            ship.hp--; if(ship.hp<=0){explosions.push({x:ship.x,y:ship.y,t:0}); ship.alive=false; ship.respawnIn=120+Math.floor(Math.random()*80);}
+            lasers.splice(i,1); hit=true; break;
+          }
+        }
+        if(!hit) drawLaser(l.x,l.y,l.vx,l.vy,l.color);
+      }
+      for(let i=explosions.length-1;i>=0;i--){
+        const e=explosions[i]; drawExplosion(e.x,e.y,e.t); e.t+=0.045; if(e.t>=1) explosions.splice(i,1);
+      }
+      raf=requestAnimationFrame(tick);
+    }
+    tick();
+    return ()=>{ cancelAnimationFrame(raf); window.removeEventListener("resize",onResize); };
+  },[]);
+  return <canvas ref={canvasRef} style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:1,opacity:0.6}}/>;
+}
+
+function Runner() {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let W = canvas.width = canvas.offsetWidth;
+    const H = canvas.height = 100;
+    window.addEventListener("resize", () => { W = canvas.width = canvas.offsetWidth; });
+    const GROUND=H-28, CHAR_X=90, GRAVITY=0.55, JUMP_V=-11, OBS_SPD=3.2;
+    const GREEN="#7ee787", AMBER="#f0b561", RED="#ff7a7a", MUTED="#5d6f66", DIM="#3d4a44";
+    let charY=GROUND, velY=0, onGround=true, frame=0, frameTick=0;
+    let obstacles=[], spawnT=160, dead=false, deadTimer=0, score=0, hi=0, raf;
+    const jump = () => { if(onGround&&!dead){velY=JUMP_V;onGround=false;} };
+    const onKey   = (e) => { if(e.code==="Space"){e.preventDefault();jump();} };
+    const onTouch = ()  => jump();
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("touchstart", onTouch, {passive:true});
+    const SPRITES = [
+      ["^‿^"," | ","/\\ "],["^‿^"," | ","| |"],
+      ["^‿^"," | ","/ \\"],["^‿^"," | ","\\ /"],
+    ];
+    const DEAD_S=["X_X"," | ","xxx"], JUMP_S=["^‿^"," | "," | "];
+    function drawChar() {
+      const rows=dead?DEAD_S:!onGround?JUMP_S:SPRITES[frame], color=dead?RED:GREEN;
+      ctx.save();
+      ctx.font=`13px "JetBrains Mono",monospace`; ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=dead?6:10; ctx.textAlign="center";
+      for(let r=0;r<3;r++) ctx.fillText(rows[2-r], CHAR_X, charY-2-r*16);
+      ctx.restore();
+    }
+    function drawObs(o) {
+      const color=o.type===1?AMBER:GREEN, ch=o.type===0?"╥":o.type===1?"◆":"╥ ╥", size=o.type===0?22:o.type===1?18:16;
+      ctx.save();
+      ctx.font=`${size}px "JetBrains Mono",monospace`; ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=10; ctx.textAlign="center";
+      ctx.fillText(ch, o.x, GROUND-2);
+      ctx.restore();
+    }
+    function txt(str, x, y, color, size, align="left") {
+      ctx.save(); ctx.font=`${size}px "JetBrains Mono",monospace`; ctx.fillStyle=color; ctx.textAlign=align; ctx.shadowBlur=0; ctx.fillText(str,x,y); ctx.restore();
+    }
+    function tick() {
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle="rgba(6,14,9,0.88)"; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle="#2d3b34"; ctx.fillRect(0,GROUND+2,W,1);
+      txt(`HI  ${String(hi).padStart(5,"0")}`, 16, 18, MUTED, 11);
+      txt(String(score).padStart(5,"0"), 90, 18, GREEN, 11);
+      txt("SPACE / tap to jump", W-16, 18, DIM, 10, "right");
+      if(!dead){
+        if(!onGround){ velY+=GRAVITY; charY+=velY; if(charY>=GROUND){charY=GROUND;velY=0;onGround=true;} }
+        frameTick++; if(frameTick>=7){frame=(frame+1)%4;frameTick=0;}
+        score++; if(score>hi) hi=score;
+        spawnT--; if(spawnT<=0){ obstacles.push({x:W+40,type:Math.floor(Math.random()*3)}); spawnT=120+Math.floor(Math.random()*130); }
+        obstacles.forEach(o=>o.x-=OBS_SPD);
+        obstacles=obstacles.filter(o=>o.x>-60);
+        for(const o of obstacles){
+          const obsH=o.type===0?28:22;
+          if(Math.abs(o.x-CHAR_X)<18&&charY>GROUND-obsH){dead=true;deadTimer=90;break;}
+        }
+      } else {
+        deadTimer--;
+        if(deadTimer<=0){dead=false;charY=GROUND;velY=0;onGround=true;obstacles=[];spawnT=160;score=0;}
+        if(deadTimer%10<7){ ctx.save(); ctx.font=`11px "JetBrains Mono",monospace`; ctx.fillStyle=RED; ctx.shadowColor=RED; ctx.shadowBlur=8; ctx.textAlign="left"; ctx.fillText("GAME OVER — respawning...",CHAR_X+30,GROUND-18); ctx.restore(); }
+      }
+      obstacles.forEach(drawObs);
+      drawChar();
+      raf=requestAnimationFrame(tick);
+    }
+    raf=requestAnimationFrame(tick);
+    return ()=>{ cancelAnimationFrame(raf); window.removeEventListener("keydown",onKey); window.removeEventListener("touchstart",onTouch); };
+  },[]);
+  return <canvas ref={canvasRef} style={{position:"absolute",bottom:0,left:0,width:"100%",height:"100px",display:"block",zIndex:10,borderTop:"1px solid #1f2a25"}}/>;
+}
+
+function StatusBar() {
+  const [time, setTime] = useState("");
+  useEffect(() => {
+    const fmt = () => {
+      const d = new Date();
+      setTime(`${String(d.getUTCHours()).padStart(2,"0")}:${String(d.getUTCMinutes()).padStart(2,"0")}:${String(d.getUTCSeconds()).padStart(2,"0")} UTC`);
+    };
+    fmt(); const t = setInterval(fmt,1000); return ()=>clearInterval(t);
+  },[]);
+  return (
+    <div className="statusbar">
+      <div><span className="sb-mark">●</span> dakotastraub.com</div>
+      <div className="sb-hide-sm">web · seo · paid ads</div>
+      <div className="sb-hide-sm">louisville, ky</div>
+      <div className="sb-spacer"></div>
+      <div className="sb-hide-sm"><span className="live-dot"></span> taking clients</div>
+      <div className="sb-time">{time}</div>
+    </div>
+  );
+}
+
+function Nav() {
+  return (
+    <nav className="nav">
+      <a href="#top" className="nav-mark">Dakota Straub<span className="cursor"></span></a>
+      <div className="nav-links">
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#work">Work</a>
+        <a href="#stack">Stack</a>
+        <a href="#resume">Resume</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <a href="#contact" className="nav-cta">Hire me</a>
+    </nav>
+  );
+}
+
+function SysInfo() {
+  return (
+    <div className="sysinfo">
+      <div className="sysinfo-head">
+        <div className="dots"><i/><i/><i/></div>
+        <div className="title">dakota.profile</div>
+      </div>
+      <div className="sysinfo-body">
+        <div className="sysinfo-portrait">
+          <img src="headshot.png" alt="Dakota Straub"/>
+        </div>
+        <div className="sysinfo-fields">
+          <div className="sysinfo-row"><span className="k">Name</span><span className="v">Dakota Straub</span></div>
+          <div className="sysinfo-row"><span className="k">Role</span><span className="v">Web & Marketing</span></div>
+          <div className="sysinfo-row"><span className="k">Based</span><span className="v">Louisville, KY</span></div>
+          <div className="sysinfo-row"><span className="k">Status</span><span className="v" style={{color:"var(--green)"}}>Open for work</span></div>
+          <div className="sysinfo-divider">─────────────────────</div>
+          <div className="sysinfo-row"><span className="k">Focus</span><span className="v">Web · SEO · Ads</span></div>
+          <div className="sysinfo-row"><span className="k">Since</span><span className="v">2020</span></div>
+        </div>
+      </div>
+      <div className="sysinfo-bars">
+        <div className="sysinfo-bar">
+          <div className="row"><span>Focus</span><span>92%</span></div>
+          <div className="track"><div className="fill" style={{width:"92%"}}></div></div>
+        </div>
+        <div className="sysinfo-bar">
+          <div className="row"><span>Years in tech</span><span>5+</span></div>
+          <div className="track"><div className="fill" style={{width:"70%"}}></div></div>
+        </div>
+        <div className="sysinfo-bar">
+          <div className="row"><span>Client slots open</span><span>2 of 4</span></div>
+          <div className="track"><div className="fill" style={{width:"50%",background:"var(--amber)"}}></div></div>
+        </div>
+      </div>
+      <div className="sysinfo-foot">
+        <span>Available now</span><span style={{color:"var(--green)"}}>● online</span>
+      </div>
+    </div>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="hero" id="top" style={{position:"relative"}}>
+      <div className="hero-inner">
+        <div className="hero-text">
+          <div className="hero-eyebrow">Web Design · SEO · Google Ads · Louisville, KY</div>
+          <h1>I build brands<br/><span className="h1-dim">from the ground up.</span></h1>
+          <p className="hero-summary">
+            I work with <span className="key">local service businesses</span> — HVAC, plumbing,
+            electrical, dumpster rental, landscaping, and more. I build the website,
+            get you ranking on Google, and run the ads that bring in the calls.
+          </p>
+          <div className="hero-cta">
+            <a className="btn btn-primary" href="#contact">Start a project</a>
+            <a className="btn" href="#work">See my work</a>
+            <a className="btn" href="#resume">View resume</a>
+          </div>
+          <div className="hero-tip">Press <span className="kbd">SPACE</span> to play · <span className="kbd">↓</span> to explore</div>
+        </div>
+        <div className="hero-card"><SysInfo/></div>
+      </div>
+      <Runner/>
+    </section>
+  );
+}
+
+function AsciiDivider() {
+  return (
+    <div className="ascii-divider">
+      ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+    </div>
+  );
+}
+
+function About() {
+  return (
+    <section id="about">
+      <div className="wrap">
+        <div className="section-tag">
+          <span className="num">01</span><span>About</span>
+          <span className="line"></span><span className="meta">Who I am</span>
+        </div>
+        <div className="about-grid">
+          <div>
+            <h2>Your phone should be ringing. Let's make that happen.</h2>
+            <p style={{marginTop:24}}>
+              I work specifically with local service businesses — HVAC, plumbing, electrical,
+              dumpster rental, landscaping, roofing. If you rely on people finding you locally,
+              I'm your guy.
+            </p>
+            <p>
+              I <span className="green">build the website</span> that converts visitors into calls,
+              get you <span className="green">ranking on Google</span> when someone searches your service,
+              and run <span className="green">Google Ads</span> that bring in calls — not just clicks.
+            </p>
+            <p>
+              Years inside ops teams and engineering departments at Apple, KFC, Humana, and digital
+              agencies means I think about your whole business, not just your homepage.
+            </p>
+          </div>
+          <div className="tree">
+            <div className="head">Who I work with</div>
+            <pre>
+{`local-service-businesses/
+├── `}<span className="accent">HVAC</span>{`
+├── `}<span className="accent">Plumbing</span>{`
+├── `}<span className="accent">Electrical</span>{`
+├── `}<span className="accent">Dumpster Rental</span>{`
+├── `}<span className="accent">Landscaping</span>{`
+├── `}<span className="accent">Roofing</span>{`
+├── `}<span className="file">Pest Control</span>{`
+├── `}<span className="file">Pressure Washing</span>{`
+└── `}<span className="file">+ any trade service</span>
+            </pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Services() {
+  const cmds = [
+    { num:"01", name:"Web Design",
+      desc:"A fast, conversion-focused website built around your business. Not a template — a real site designed to turn visitors into calls.",
+      tags:["custom design","mobile-first","fast load","built to convert"] },
+    { num:"02", name:"Local SEO",
+      desc:"Get found when someone in your area searches for your service. Google Business Profile, local citations, technical SEO, and content that ranks.",
+      tags:["Google Business","local rankings","technical SEO","content"] },
+    { num:"03", name:"Google Ads",
+      desc:"Search and Local Services Ads that bring in calls, not just clicks. Built, managed, and reported on monthly with real ROI.",
+      tags:["Google Search","local services ads","call tracking","monthly reporting"] },
+    { num:"04", name:"Brand Identity",
+      desc:"Logo, colors, and a visual identity that makes your business look professional and trustworthy from the first impression.",
+      tags:["logo design","brand colors","typography","brand guidelines"] },
+  ];
+  return (
+    <section id="services">
+      <div className="wrap">
+        <div className="section-tag">
+          <span className="num">02</span><span>Services</span>
+          <span className="line"></span><span className="meta">What I do</span>
+        </div>
+        <h2>Everything you need to get found and get called</h2>
+        <div className="cmd-list">
+          {cmds.map(c => (
+            <div className="cmd-row" key={c.num}>
+              <div className="cmd-num">{c.num}</div>
+              <div className="cmd-name">{c.name}</div>
+              <div>
+                <div className="cmd-desc">{c.desc}</div>
+                <div className="cmd-tags">{c.tags.map(t=><span key={t}>{t}</span>)}</div>
+              </div>
+              <div className="cmd-arrow">→</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProjThumb({ kind }) {
+  const label = kind==="site"?"Web Design":kind==="seo"?"Local SEO":kind==="ads"?"Google Ads":"Brand Identity";
+  return (
+    <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" style={{width:"100%",height:"100%"}}>
+      <rect width="400" height="250" fill="#0f1411"/>
+      <rect x="30" y="30" width="340" height="190" rx="6" fill="#0a0e0c" stroke="#1f2a25"/>
+      <text x="48" y="60" fontFamily="JetBrains Mono" fontSize="12" fill="#7ee787">{label}</text>
+      <line x1="48" y1="76" x2="350" y2="76" stroke="#1f2a25"/>
+      <rect x="48" y="100" width="160" height="10" rx="2" fill="#7ee787"/>
+      <rect x="48" y="122" width="230" height="8"  rx="2" fill="#2d3b34"/>
+      <rect x="48" y="140" width="190" height="8"  rx="2" fill="#2d3b34"/>
+      <rect x="48" y="174" width="90"  height="24" rx="3" fill="#7ee787" opacity="0.85"/>
+      <rect x="250" y="100" width="78" height="78" rx="6" fill="#7ee787" opacity="0.12" stroke="#7ee787"/>
+    </svg>
+  );
+}
+
+function Projects() {
+  const items = [
+    { id:"001", title:"Local service websites", kind:"site", badge:"ACTIVE",
+      desc:"Custom sites for HVAC, plumbing, electrical, and trade businesses. Built to convert visitors into calls.",
+      stats:[["Sites built","12+"],["Avg Lighthouse","98"],["Timeline","2–4 weeks"]] },
+    { id:"002", title:"Local SEO programs", kind:"seo", badge:"RECURRING",
+      desc:"Google rankings for local service businesses. More searches, more calls, more booked jobs.",
+      stats:[["Clients","Ongoing"],["Traffic lift","2–5×"],["Reporting","Monthly"]] },
+    { id:"003", title:"Google Ads campaigns", kind:"ads", badge:"RUNNING",
+      desc:"Search and Local Services Ads for service businesses. Built around calls and booked jobs.",
+      stats:[["Spend managed","6-fig"],["Avg ROAS","3.8×"],["Platform","Google"]] },
+    { id:"004", title:"Brand identity", kind:"brand", badge:"DESIGN",
+      desc:"Logo, palette, and visual system that makes a local business look credible and professional.",
+      stats:[["Deliverables","Full kit"],["Revisions","Included"],["Timeline","2–4 weeks"]] },
+  ];
+  return (
+    <section id="work">
+      <div className="wrap">
+        <div className="section-tag">
+          <span className="num">03</span><span>Work</span>
+          <span className="line"></span><span className="meta">Recent projects</span>
+        </div>
+        <h2>Real work for real service businesses</h2>
+        <div className="proj-grid">
+          {items.map(p=>(
+            <article className="proj-card" key={p.id}>
+              <div className="proj-head">
+                <span className="id">PRJ_{p.id}</span>
+                <span className="badge">{p.badge}</span>
+              </div>
+              <div className="proj-thumb"><ProjThumb kind={p.kind}/></div>
+              <div className="proj-body">
+                <h3>{p.title}</h3>
+                <p>{p.desc}</p>
+                <div className="proj-stats">
+                  {p.stats.map(([k,v])=>(
+                    <div key={k}><div>{k}</div><div className="v">{v}</div></div>
+                  ))}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Stack() {
+  const cells = [
+    { cat:"Front-end",     items:["React","TypeScript","Tailwind CSS","Vanilla JS","HTML / CSS"] },
+    { cat:"Back-end",      items:["Node.js","SQL","REST APIs","Supabase","Webhooks"] },
+    { cat:"Marketing",     items:["Google Ads","Google LSA","GA4 / GTM","SEO tooling","CMS"] },
+    { cat:"Ops & Systems", items:["Agile / Scrum","SRE practices","Palo Alto","Monitoring","Process design"] },
+  ];
+  return (
+    <section id="stack">
+      <div className="wrap">
+        <div className="section-tag">
+          <span className="num">04</span><span>Stack</span>
+          <span className="line"></span><span className="meta">Tools I use</span>
+        </div>
+        <h2>The toolkit</h2>
+        <div className="stack-grid">
+          {cells.map(c=>(
+            <div className="stack-cell" key={c.cat}>
+              <div className="cat">{c.cat}</div>
+              <ul>{c.items.map(i=><li key={i}>{i}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Resume() {
+  const jobs = [
+    { yr:"Nov 2024 — Present", title:"Director of Operations & Client Experience", co:"Spear Crest Digital — Louisville, KY",
+      bullets:["Grew monthly revenue from $20K to $70K+ through operational and strategic improvements.","Led cross-functional teams executing project plans.","Streamlined workflows across digital marketing campaigns.","Oversee daily operations across multiple departments."]},
+    { yr:"Jan 2023 — Dec 2024", title:"Senior Solutions Architect", co:"SIG Digital",
+      bullets:["Improved dev efficiency and reduced time to market via agile practices.","Optimized application performance and led architectural design of complex client solutions.","Developed integration strategies for web-based applications."]},
+    { yr:"Feb 2022 — Jan 2023", title:"Site Reliability Engineer", co:"KFC",
+      bullets:["Built SRE team capabilities supporting 2,000+ retail locations.","Increased incident response efficiency via automated alerting and monitoring."]},
+    { yr:"Jul 2021 — Feb 2022", title:"Network Engineer (Contract)", co:"Humana",
+      bullets:["Palo Alto firewall assessments, SQL Server health, and network infrastructure projects."]},
+    { yr:"Jul 2020 — Jul 2021", title:"Tech Sales Associate", co:"Apple",
+      bullets:["Helped customers identify and solve technology needs with strong product knowledge."]},
+  ];
+  return (
+    <section className="resume" id="resume">
+      <div className="wrap">
+        <div className="section-tag">
+          <span className="num">05</span><span>Resume</span>
+          <span className="line"></span><span className="meta">Work history</span>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"end",flexWrap:"wrap",gap:16}}>
+          <h2>Experience</h2>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+            <a className="btn" href="Dakota_Straub_Resume.pdf" target="_blank" rel="noreferrer">Download PDF</a>
+            <a className="btn btn-primary" href="https://www.linkedin.com/in/dakotastraub/" target="_blank" rel="noreferrer">LinkedIn</a>
+          </div>
+        </div>
+        <div className="resume-doc">
+          <aside className="resume-side">
+            <h3>Dakota Straub</h3>
+            <div className="role">Operations · Web · Marketing</div>
+            <div className="block">
+              <div className="lbl">Contact</div>
+              <ul>
+                <li className="row"><span>Email</span><a href="mailto:dakotastraub@outlook.com">dakotastraub@…</a></li>
+                <li className="row"><span>Phone</span><span>502.445.5589</span></li>
+                <li className="row"><span>Based</span><span>Louisville, KY</span></li>
+                <li className="row"><span>LinkedIn</span><a href="https://www.linkedin.com/in/dakotastraub/" target="_blank" rel="noreferrer">in/dakotastraub</a></li>
+              </ul>
+            </div>
+            <div className="block">
+              <div className="lbl">Core Skills</div>
+              <ul>
+                <li>Project & ops management</li>
+                <li>Strategic planning</li>
+                <li>Process improvement</li>
+                <li>Cross-functional leadership</li>
+                <li>Web · SEO · Paid ads</li>
+              </ul>
+            </div>
+            <div className="block">
+              <div className="lbl">Education</div>
+              <ul><li>A.S. Information Systems<br/><span style={{color:"var(--muted)"}}>Jefferson C&TC</span></li></ul>
+            </div>
+            <div className="block">
+              <div className="lbl">Certifications</div>
+              <ul><li>CompTIA A+</li><li>CompTIA Security+</li><li>CompTIA Network+</li></ul>
+            </div>
+          </aside>
+          <div className="resume-main">
+            <h4>Summary</h4>
+            <p className="resume-summary">Operations professional with a strong background in managing complex projects and driving operational excellence. Collaborative, dependable, and adaptable with proven skills in strategic planning and team leadership.</p>
+            <h4>Work History</h4>
+            {jobs.map((j,i)=>(
+              <div className="resume-job" key={i}>
+                <div className="resume-job-head">
+                  <div><div className="title">{j.title}</div><div className="co">{j.co}</div></div>
+                  <div className="yr">{j.yr}</div>
+                </div>
+                <ul>{j.bullets.map((b,k)=><li key={k}>{b}</li>)}</ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Vision() {
+  const items = [
+    { lbl:"01 — Mission", title:"Help local businesses get found and get called", desc:"Most service businesses are incredible at their trade but invisible online. I fix that — one website, one market, one business at a time." },
+    { lbl:"02 — Growth",  title:"Make marketing feel predictable", desc:"No mystery dashboards. Clear plans, real numbers, and campaigns that tie directly to calls and booked jobs." },
+    { lbl:"03 — Studio",  title:"Build a small, focused studio", desc:"Fewer clients, deeper work. I want to be the person you call first when something needs to grow." },
+  ];
+  return (
+    <section id="vision">
+      <div className="wrap">
+        <div className="section-tag">
+          <span className="num">06</span><span>Vision</span>
+          <span className="line"></span><span className="meta">Where this is headed</span>
+        </div>
+        <h2>Where this is going</h2>
+        <div className="panel-grid">
+          {items.map(i=>(
+            <div className="panel" key={i.lbl}>
+              <div className="lbl">{i.lbl}</div>
+              <h3>{i.title}</h3>
+              <p>{i.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Contact() {
+  return (
+    <section className="contact" id="contact">
+      <div className="wrap">
+        <div className="section-tag">
+          <span className="num">07</span><span>Contact</span>
+          <span className="line"></span><span className="meta">Let's talk</span>
+        </div>
+        <h2>Ready to get more calls? Let's talk.</h2>
+        <p style={{maxWidth:540,marginTop:16,color:"var(--fg-2)"}}>
+          I work with local service businesses that are serious about growing. Reach out — I respond fast and I'll tell you straight whether I can help.
+        </p>
+        <div className="contact-shell">
+          <div className="terminal">
+            <div className="terminal-head">
+              <div className="dots"><i/><i/><i/></div>
+              <div>Contact — dakotastraub.com</div>
+            </div>
+            <div className="terminal-body">
+              <div className="line cmd"><span className="prompt">$</span><span>reach out</span></div>
+              <div className="line out"><span><span className="k">→</span> Email: <a href="mailto:dakotastraub@outlook.com" style={{color:"var(--green)",borderBottom:"1px dashed currentColor"}}>dakotastraub@outlook.com</a></span></div>
+              <div className="line out"><span><span className="k">→</span> Phone: <a href="tel:5024455589" style={{color:"var(--green)",borderBottom:"1px dashed currentColor"}}>+1 502.445.5589</a></span></div>
+              <div className="line empty"></div>
+              <div className="line cmd"><span className="prompt">$</span><span>how it works</span></div>
+              <div className="line out">1. Tell me about your business and goals</div>
+              <div className="line out">2. I scope it out and you approve</div>
+              <div className="line out">3. We build, launch, and grow</div>
+              <div className="line empty"></div>
+              <div className="line cmd">
+                <span className="prompt">$</span>
+                <span style={{display:"inline-flex",alignItems:"center",gap:4}}>waiting<span style={{display:"inline-block",width:7,height:14,background:"var(--green)",verticalAlign:"middle",animation:"cursor 1s step-end infinite"}}></span></span>
+              </div>
+            </div>
+          </div>
+          <div className="contact-side">
+            {[
+              {k:"Email",     v:"dakotastraub@outlook.com", href:"mailto:dakotastraub@outlook.com"},
+              {k:"LinkedIn",  v:"in/dakotastraub",          href:"https://www.linkedin.com/in/dakotastraub/"},
+              {k:"Instagram", v:"@dakotastraub",            href:"https://www.instagram.com/dakotastraub/"},
+              {k:"Phone",     v:"502.445.5589",             href:"tel:5024455589"},
+              {k:"Location",  v:"Louisville, KY",           href:"#"},
+            ].map(r=>(
+              <a className="contact-row" key={r.k} href={r.href} target={r.href.startsWith("http")?"_blank":undefined} rel="noreferrer">
+                <span className="k">{r.k}</span><span className="v">{r.v}</span><span className="arrow">↗</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer>
+      <span>© {new Date().getFullYear()} Dakota Straub · Louisville, KY</span>
+      <span className="pulse"><i></i> Online · Available for work</span>
+    </footer>
+  );
+}
+
+Object.assign(window, {
+  Starfighters,
+  StatusBar, Nav, Hero, AsciiDivider,
+  About, Services, Projects, Stack,
+  Resume, Vision, Contact, Footer,
+});
