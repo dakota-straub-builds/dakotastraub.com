@@ -325,7 +325,7 @@ function Nav() {
   return (
     <nav className="nav">
       <a href="#top" className="nav-mark">
-        <span className="prompt">~/</span>dakota<span className="cursor"></span>
+        <span className="prompt">~/</span>dakota.straub<span className="cursor"></span>
       </a>
       <div className="nav-links">
         <a href="#about">about</a>
@@ -335,7 +335,7 @@ function Nav() {
         <a href="#resume">resume</a>
         <a href="#contact">contact</a>
       </div>
-      <a href="#contact" className="nav-cta">./hire-me.sh</a>
+      <a href="#contact" className="nav-cta">./hire-me</a>
     </nav>
   );
 }
@@ -343,10 +343,10 @@ function Nav() {
 /* ───────── Hero ───────── */
 function BootLog() {
   const lines = [
-    { ts: "[00.000]", lvl: "ok",   msg: "boot: dakotastraub.com / kernel up" },
-    { ts: "[00.012]", lvl: "info", msg: "loading services: web · seo · ads · brand" },
+    { ts: "[00.000]", lvl: "ok",   msg: "boot: dakotastraub.com" },
+    { ts: "[00.012]", lvl: "info", msg: "loading services: web · seo · ads · brand building" },
     { ts: "[00.034]", lvl: "ok",   msg: "auth: dakota_straub@operator [verified]" },
-    { ts: "[00.072]", lvl: "warn", msg: "queue: accepting 2 freelance slots" },
+    { ts: "[00.072]", lvl: "warn", msg: "queue: accepting new freelance slots" },
     { ts: "[00.091]", lvl: "ok",   msg: "ready. waiting for input ▌" },
   ];
   const [shown, setShown] = useState(0);
@@ -384,7 +384,7 @@ function SysInfo() {
           <div className="sysinfo-row"><span className="k">host</span><span className="v">louisville-ky</span></div>
           <div className="sysinfo-row"><span className="k">status</span><span className="v">online · taking work</span></div>
           <div className="sysinfo-divider">─────────────────────</div>
-          <div className="sysinfo-row"><span className="k">stack</span><span className="v">web · seo · paid</span></div>
+          <div className="sysinfo-row"><span className="k">stack</span><span className="v">web · seo · paid ads</span></div>
           <div className="sysinfo-row"><span className="k">since</span><span className="v">2020</span></div>
         </div>
       </div>
@@ -394,11 +394,11 @@ function SysInfo() {
           <div className="track"><div className="fill" style={{width: "92%"}}></div></div>
         </div>
         <div className="sysinfo-bar">
-          <div className="row"><span>uptime / yrs in tech</span><span>5+</span></div>
+          <div className="row"><span>uptime / yrs in tech</span><span>10+</span></div>
           <div className="track"><div className="fill" style={{width: "70%"}}></div></div>
         </div>
         <div className="sysinfo-bar">
-          <div className="row"><span>queue / open slots</span><span>2/4</span></div>
+          <div className="row"><span>in-queue / open slots</span><span>open</span></div>
           <div className="track"><div className="fill" style={{width: "50%", background: "var(--amber)"}}></div></div>
         </div>
       </div>
@@ -413,8 +413,7 @@ function SysInfo() {
 function Hero() {
   return (
     <section className="hero" id="top" style={{position: "relative"}}>
-      {/* Centered content wrapper */}
-      <div className="hero-center">
+      <div className="hero-left">
         <BootLog/>
         <div className="hero-comment">name = "Dakota Straub" · stack = ["web", "seo", "paid"]</div>
         <h1>
@@ -430,12 +429,22 @@ function Hero() {
         </p>
         <div className="hero-cta">
           <a className="btn btn-primary" href="#contact">start_project</a>
-          <a className="btn" href="#resume">cat resume.md</a>
-          <a className="btn" href="#work">ls ./projects</a>
+          <a className="btn" href="#resume">my resume</a>
+          <a className="btn" href="#work">check out ./projects</a>
         </div>
         <div style={{marginTop: 22, fontSize: 11.5, color: "var(--muted)"}}>
           tip: press <span className="kbd">↓</span> to scroll, or <span className="kbd">⌘</span>+<span className="kbd">k</span> for nothing in particular
         </div>
+      </div>
+
+      <div className="hero-right">
+        <SysInfo/>
+      </div>
+
+      <Runner />
+    </section>
+  );
+}
 
         {/* Sysinfo card below, centered */}
         <div className="hero-card-wrap">
