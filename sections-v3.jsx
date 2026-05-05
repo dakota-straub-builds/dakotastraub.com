@@ -425,7 +425,7 @@ function Hero() {
         <p className="hero-summary">
           Freelance web designer + digital marketer based in Louisville, KY.
           I ship <span className="key">fast websites</span>, dial in <span className="key">targeted SEO</span>,
-          and run <span className="key">paid campaigns</span> on Google &amp; Meta — so customers actually find what
+          and run <span className="key">paid campaigns</span> on Google — so customers actually find what
           you're building.
         </p>
         <div className="hero-cta">
